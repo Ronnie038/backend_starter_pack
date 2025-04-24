@@ -1,0 +1,6 @@
+node_modules
+dist
+.vercel
+.qodo
+.env
+uploads
