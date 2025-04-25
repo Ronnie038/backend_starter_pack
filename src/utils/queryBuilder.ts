@@ -110,7 +110,8 @@ class QueryBuilder {
 
 			const queryObj = this.pick(queryFields);
 
-			if (Object.keys(queryObj).length === 0) return;
+			if (Object.keys(queryObj).length === 0 && searchOption !== "search")
+				return;
 
 			const orConditions = this.prismaQuery?.where?.OR || [];
 			const AndConditions = this.prismaQuery?.where?.AND || [];
@@ -171,7 +172,7 @@ class QueryBuilder {
 				);
 				this.prismaQuery.where = {
 					...this.prismaQuery?.where,
-					AND: [...AndConditions, nestedConditions],
+					AND: [...AndConditions, ...nestedConditions],
 				};
 			}
 		});
@@ -190,40 +191,6 @@ class QueryBuilder {
 		return this;
 	}
 
-	// // Less Than Filter
-	// lessThanFilter(comparisons: ComparisonFilterParams[]) {
-	// 	comparisons.forEach((comparison) => {
-	// 		const { field, queryKey, nestedField } = comparison;
-	// 		const queryObj = this.pick([queryKey]);
-	// 		const values = Object.values(queryObj);
-
-	// 		if (values.length === 0) return this;
-
-	// 		const condition = { [field]: { lte: values[0] } }; // Use 'lt' for less than
-
-	// 		this.applyCondition({ field, nestedField, condition });
-	// 	});
-
-	// 	return this;
-	// }
-
-	// Greater Than Filter
-	// greaterThanFilter(comparisons: ComparisonFilterParams[]) {
-	// 	comparisons.forEach((comparison) => {
-	// 		const { field, queryKey, nestedField } = comparison;
-	// 		const queryObj = this.pick([queryKey]);
-	// 		const values = Object.values(queryObj);
-
-	// 		if (values.length === 0) return this;
-
-	// 		const condition = { [field]: { gte: values[0] } }; // Use 'gt' for greater than
-
-	// 		this.applyCondition({ field, nestedField, condition });
-	// 	});
-
-	// 	return this;
-	// }
-
 	// Range (Between) Filter
 	filterByRange(betweenFilters: rangeFilteringPrams[]) {
 		betweenFilters.forEach(
@@ -236,7 +203,13 @@ class QueryBuilder {
 
 				// Helper function to cast values based on data type
 				const castValue = (value: any) => {
-					if (dataType === "date") return new Date(value);
+					if (dataType === "date") {
+						const dateParts = value.split("-");
+						const utcDate = new Date(
+							Date.UTC(dateParts[0], Number(dateParts[1]) - 1, dateParts[2])
+						);
+						return utcDate;
+					}
 					if (dataType === "number") return Number(value);
 					return value;
 				};
@@ -302,7 +275,7 @@ class QueryBuilder {
 	// *Include Related Models/
 	include(includableFields: Record<string, boolean | object>) {
 		this.prismaQuery.include = {
-			...this.prismaQuery.include,
+			...this.prismaQuery?.include,
 			...includableFields,
 		};
 		return this;
