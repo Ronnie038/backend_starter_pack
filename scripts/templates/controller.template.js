@@ -3,6 +3,16 @@ import catchAsync from "../../../shared/catchAsync";
 import sendResponse from "../../../shared/sendResponse";
 import { ${pascal}Services } from "./${camel}.service";
 
+const create${pascal} = catchAsync(async (req, res) => {
+	const result = await ${pascal}Services.create${pascal}(req);
+	sendResponse(res, {
+		statusCode: httpStatus.CREATED,
+		success: true,
+		message: "${pascal} created successfully",
+		data: result,
+	
+	});
+});
 const get${pascal}s = catchAsync(async (req, res) => {
 	const result = await ${pascal}Services.get${pascal}s(req);
 	sendResponse(res, {
@@ -44,9 +54,10 @@ const delete${pascal} = catchAsync(async (req, res) => {
 	});
 });
 
-export const ${pascal}Controller = {
+export const ${pascal}Controllers = {
 	get${pascal}s,
 	get${pascal}ById,
 	update${pascal},
 	delete${pascal},
+	create${pascal},
 };`;

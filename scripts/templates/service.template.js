@@ -13,6 +13,18 @@ import httpStatus from "http-status";
 import ApiError from "../../../errors/ApiErrors";
 import { Prisma } from "@prisma/client";
 
+
+const create${pascal} = async (req: Request) => {
+	const payload = req.body;
+	if (req.file?.filename) {
+		payload.image = \`\${config.backend_url}/uploads/\${req.file.filename}\`\;
+	}
+
+	const ${camel} = await prisma.${camel}.create({ data: payload });
+
+	return ${camel};
+};
+
 const get${pascal}s = async (req: Request) => {
 	const queryBuilder = new QueryBuilder(req.query, prisma.${camel});
 	const results = await queryBuilder
@@ -71,4 +83,5 @@ export const ${pascal}Services = {
 	get${pascal}ById,
 	update${pascal},
 	delete${pascal},
+	create${pascal}
 };`;

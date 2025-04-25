@@ -1,5 +1,5 @@
 module.exports = ({ pascal, camel }) => `import { Router } from "express";
-import { ${pascal}Controller } from "./${camel}.controller";
+import { ${pascal}Controllers } from "./${camel}.controller";
 import auth from "../../middlewares/auth";
 import { UserRole } from "@prisma/client";
 import { upload } from "../../../helpars/fileUploader";
@@ -9,12 +9,25 @@ import { ${pascal}Validations } from "./${camel}.validation";
 
 const router = Router();
 
-router.route("/").get(${pascal}Controller.get${pascal}s);
+router.route("/")
+ 	.post(
+		auth("-----"),
+		upload.single("image"),
+		parseBodyData,
+		validateRequest(${pascal}Validations.create${pascal}Schema),
+		${pascal}Controllers.create${pascal}
+	)
+  .get(${pascal}Controllers.get${pascal}s);
 
 router
 	.route("/:id")
-	.get(${pascal}Controller.get${pascal}ById)
-	.put(${pascal}Controller.update${pascal})
-	.delete(${pascal}Controller.delete${pascal});
+	.get(${pascal}Controllers.get${pascal}ById)
+	.put(
+		auth("-----"),
+		upload.single("image"),
+		parseBodyData,
+		validateRequest(${pascal}Validations.update${pascal}Schema),
+	    ${pascal}Controllers.update${pascal})
+	.delete(${pascal}Controllers.delete${pascal});
 
 export const ${pascal}Routes = router;`;

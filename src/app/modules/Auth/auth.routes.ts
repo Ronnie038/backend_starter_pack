@@ -1,9 +1,11 @@
-import { UserRole } from "@prisma/client";
 import express from "express";
 import auth from "../../middlewares/auth";
 import validateRequest from "../../middlewares/validateRequest";
 import { AuthController } from "./auth.controller";
 import { AuthValidation } from "./auth.validation";
+import config from "../../../config";
+import { passport } from "../../../config/passportSetup";
+import { UserRole } from "@prisma/client";
 
 const router = express.Router();
 
@@ -40,9 +42,21 @@ router.post("/reset-password", AuthController.resetPassword);
 
 router.get("/verify-email", AuthController.verifyEmail);
 router.post(
-	'/refresh-token',
+	"/refresh-token",
 	validateRequest(AuthValidation.refreshTokenValidationSchema),
-	AuthController.refreshToken,
-  );
+	AuthController.refreshToken
+);
 
+// Google Login Routes
+router.get(
+	"/google",
+	passport.authenticate("google", { scope: ["profile", "email"] })
+);
+router.get(
+	"/google/callback",
+	passport.authenticate("google", {
+		failureRedirect: `${config.frontend_url}/login`,
+		successRedirect: `${config.frontend_url}/`,
+	})
+);
 export const AuthRoutes = router;

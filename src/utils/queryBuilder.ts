@@ -19,7 +19,7 @@ interface ApplyCondition {
 	nestedField?: string;
 	condition: Record<string, any>;
 }
-class QueryBuilder {
+class QueryBuilder<T> {
 	private model: any;
 	private query: Record<string, unknown>;
 	private prismaQuery: Record<string, any> = {}; // Define as any for flexibility
@@ -80,10 +80,10 @@ class QueryBuilder {
 	}
 
 	// Filter
-	filter(includeFeilds: string[] = []) {
+	filter(includeFeilds: string[] = [], staticFilter: Partial<T> = {}) {
 		const queryObj = this.pick(includeFeilds);
 
-		if (Object.keys(queryObj).length === 0) return this;
+		// if (Object.keys(queryObj).length === 0) return this;
 
 		const formattedFilters: Record<string, any> = {};
 		for (const [key, value] of Object.entries(queryObj)) {
@@ -99,6 +99,7 @@ class QueryBuilder {
 		this.prismaQuery.where = {
 			...this.prismaQuery.where,
 			...formattedFilters,
+			...staticFilter,
 		};
 
 		return this;
@@ -137,7 +138,7 @@ class QueryBuilder {
 				const partialConditions = Object.entries(queryObj).map(
 					([key, value]) => {
 						const condition = {
-							[key]: { contains: value, mode: "insensitive" },
+							[key]: { equals: value, mode: "insensitive" },
 						};
 						return this.buildNestedCondition(pathSegments, condition);
 					}
@@ -307,3 +308,99 @@ class QueryBuilder {
 }
 
 export default QueryBuilder;
+
+function parseSelect(input: {
+	own?: string[];
+	nested?: any[];
+}): Record<string, any> {
+	const select: Record<string, any> = {};
+
+	// Handle root fields (fields directly on the model)
+	for (const field of input.own || []) {
+		select[field] = true;
+	}
+
+	// Handle nested models
+	for (const nestedItem of input.nested || []) {
+		const [modelKey, fields, nestedChildren] = nestedItem;
+
+		// Initialize the model key in select object with an empty 'select' object
+		if (!select[modelKey]) {
+			select[modelKey] = { select: {} };
+		}
+
+		// Add fields to the nested model's 'select' object
+		if (Array.isArray(fields) && fields.length > 0) {
+			fields.forEach((field) => {
+				select[modelKey].select[field] = true;
+			});
+		}
+
+		// If there are nested children, recurse into them and assign to the 'select' key
+		if (Array.isArray(nestedChildren) && nestedChildren.length > 0) {
+			select[modelKey].select = {
+				...select[modelKey].select, // Keep existing fields
+				...parseSelect({
+					own: [], // No root fields for nested models
+					nested: nestedChildren,
+				}),
+			};
+		}
+	}
+
+	return select;
+}
+
+const fields: Fields = {
+	own: ["status", "email"],
+	nested: [
+		[
+			"user",
+			["status", "subscriptionStatus"],
+			[["profile", ["name", "img"], [["member", ["id", "status"]]]]],
+		],
+		["admin", ["name", "img"], [["notification", ["id", "status"]]]],
+	],
+};
+type SelectField = string | { [key: string]: boolean | SelectField };
+
+type nestedArrayType = Array<[string, string[], nestedArrayType?]>;
+interface Fields {
+	own?: string[]; // Fields directly on the model
+	nested?: nestedArrayType;
+}
+
+const converted = {
+	status: true,
+	email: true,
+	user: {
+		select: {
+			status: true,
+			subscriptionStatus: true,
+			profile: {
+				select: {
+					name: true,
+					img: true,
+					member: {
+						select: {
+							id: true,
+							status: true,
+						},
+					},
+				},
+			},
+		},
+	},
+	admin: {
+		select: {
+			name: true,
+			img: true,
+			notification: {
+				select: {
+					id: true,
+					status: true,
+				},
+			},
+		},
+	},
+};

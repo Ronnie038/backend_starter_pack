@@ -8,145 +8,21 @@ datasource db {
 }
 
 model User {
-  id              String         @id @default(auto()) @map("_id") @db.ObjectId
+  id              String     @id @default(auto()) @map("_id") @db.ObjectId
   name            String
-  email           String         @unique
+  email           String     @unique
   password        String
   role            UserRole
-  status          UserStatus     @default(ACTIVE)
+  status          UserStatus @default(ACTIVE)
   phone           String?
-  isEmailVerified Boolean        @default(false)
-  isDeleted       Boolean        @default(false)
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @updatedAt
+  isEmailVerified Boolean    @default(false)
+  isDeleted       Boolean    @default(false)
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
   otp             String?
   otpExpiry       DateTime?
-  investor        Investor?
-  company         Company?
-  // wallet        Wallet?
-  notifications   Notification[]
 
   @@map("users")
-}
-
-model Investor {
-  id               String    @id @default(auto()) @map("_id") @db.ObjectId
-  userId           String    @unique @db.ObjectId
-  nationality      String?
-  kycStatus        KycStatus @default(PENDING)
-  verifiedAt       DateTime?
-  documentUrl      String?
-  country          String?
-  currentAddress   String?
-  permanentAddress String?
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
-
-  user User @relation(fields: [userId], references: [id])
-
-  // KYCRequest KYCRequest[]
-  investment Investment[]
-
-  @@map("investers")
-}
-
-model Company {
-  id                 String             @id @default(auto()) @map("_id") @db.ObjectId
-  userId             String             @unique @db.ObjectId
-  companyName        String
-  registrationNumber String
-  website            String?
-  pitchDeckUrl       String?
-  verifiedAt         DateTime?
-  verificationStatus VerificationStatus @default(PENDING)
-  verificationReason String?
-  createdAt          DateTime           @default(now())
-  updatedAt          DateTime           @updatedAt
-  user               User               @relation(fields: [userId], references: [id])
-  campaigns          Campaign[]
-  documents          Document[]
-
-  @@map("companies")
-}
-
-model Campaign {
-  id                String         @id @default(auto()) @map("_id") @db.ObjectId
-  companyId         String         @db.ObjectId
-  title             String
-  description       String
-  fundingGoal       Float
-  minimumInvestment Float
-  type              CampaignType
-  status            CampaignStatus @default(DRAFT)
-  startDate         DateTime?
-  endDate           DateTime?
-  createdAt         DateTime       @default(now())
-  updatedAt         DateTime       @updatedAt
-  company           Company        @relation(fields: [companyId], references: [id])
-  investments       Investment[]
-  updates           Update[]
-  documents         Document[]
-
-  @@map("campaigns")
-}
-
-model Document {
-  id         String       @id @default(auto()) @map("_id") @db.ObjectId
-  campaignId String?      @db.ObjectId
-  companyId  String?      @db.ObjectId
-  fileUrl    String
-  name       String
-  type       DocumentType
-  createdAt  DateTime     @default(now())
-  updatedAt  DateTime     @updatedAt
-
-  campaign Campaign? @relation(fields: [campaignId], references: [id])
-  company  Company?  @relation(fields: [companyId], references: [id])
-
-  @@map("documents")
-}
-
-model Investment {
-  id            String        @id @default(auto()) @map("_id") @db.ObjectId
-  campaignId    String        @db.ObjectId
-  investorId    String        @db.ObjectId
-  amount        Float
-  paymentStatus PaymentStatus @default(PENDING)
-  transactionId String?
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
-
-  campaign Campaign @relation(fields: [campaignId], references: [id])
-  investor Investor @relation(fields: [investorId], references: [id])
-
-  @@map("investments")
-}
-
-model Update {
-  id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  campaignId String   @db.ObjectId
-  title      String
-  content    String
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-
-  campaign Campaign @relation(fields: [campaignId], references: [id])
-
-  @@map("updates")
-}
-
-model Notification {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId    String   @db.ObjectId
-  type      String
-  message   String
-  read      Boolean  @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  user User @relation(fields: [userId], references: [id])
-
-  @@map("notifications")
 }
 
 // model KYCRequest {

@@ -1,16 +1,16 @@
 module.exports = ({ pascal, camel }) => `
 import { z } from "zod";
 
-const create${camel}Schema = z.object({
+const create${pascal}Schema = z.object({
 	
 });
-const update${camel}Schema = z.object({
+const update${pascal}Schema = z.object({
 	
 });
 
 export const ${pascal}Validations = {
-	create${camel}Schema,
-    update${camel}Schema,
+	create${pascal}Schema,
+    update${pascal}Schema,
 };
 
 `;
