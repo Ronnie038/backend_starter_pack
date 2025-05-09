@@ -2,12 +2,12 @@ module.exports = ({ pascal, camel, lower }) => `import { Request } from "express
 import prisma from "../../../shared/prisma";
 import QueryBuilder from "../../../utils/queryBuilder";
 import {
-	${lower}FilterFields,
-	${lower}Include,
-	${lower}NestedFilters,
-	${lower}RangeFilter,
-	${lower}SearchFields,
-} from "./${lower}.constant";
+	${camel}FilterFields,
+	${camel}Include,
+	${camel}NestedFilters,
+	${camel}RangeFilter,
+	${camel}SearchFields,
+} from "./${camel}.constant";
 import config from "../../../config";
 import httpStatus from "http-status";
 import ApiError from "../../../errors/ApiErrors";

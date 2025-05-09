@@ -21,11 +21,11 @@ if (!fs.existsSync(baseDir)) {
 }
 
 const files = [
-	{ name: `${lower}.route.ts`, content: routeTemplate({ pascal, camel, lower }) },
-	{ name: `${lower}.controller.ts`, content: controllerTemplate({ pascal, camel }) },
-	{ name: `${lower}.service.ts`, content: serviceTemplate({ pascal, camel, lower }) },
-	{ name: `${lower}.constant.ts`, content: constantsTemplate({ pascal, camel, lower }) },
-	{ name: `${lower}.validation.ts`, content: validationsTemplate({ pascal, camel, lower }) },
+	{ name: `${camel}.route.ts`, content: routeTemplate({ pascal, camel, lower }) },
+	{ name: `${camel}.controller.ts`, content: controllerTemplate({ pascal, camel }) },
+	{ name: `${camel}.service.ts`, content: serviceTemplate({ pascal, camel, lower }) },
+	{ name: `${camel}.constant.ts`, content: constantsTemplate({ pascal, camel, lower }) },
+	{ name: `${camel}.validation.ts`, content: validationsTemplate({ pascal, camel, lower }) },
 ];
 
 files.forEach(({ name, content }) => {
