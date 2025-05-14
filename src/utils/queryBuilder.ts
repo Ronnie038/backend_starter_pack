@@ -60,9 +60,18 @@ class QueryBuilder<T> {
 			OR: [...existingOrCondition, finalCondition],
 		};
 	}
-	constructor(query: Record<string, unknown>, model: any) {
+	constructor(
+		query: Record<string, unknown>,
+		model: any,
+		staticFilter: Partial<T> = {}
+	) {
 		this.model = model; // Prisma model instance
 		this.query = query; // Query params
+
+		this.prismaQuery.where = {
+			...this.prismaQuery.where,
+			...staticFilter,
+		};
 	}
 	// Search
 	search(searchableFields: string[]) {
@@ -80,7 +89,7 @@ class QueryBuilder<T> {
 	}
 
 	// Filter
-	filter(includeFeilds: string[] = [], staticFilter: Partial<T> = {}) {
+	filter(includeFeilds: string[] = []) {
 		const queryObj = this.pick(includeFeilds);
 
 		// if (Object.keys(queryObj).length === 0) return this;
@@ -99,7 +108,6 @@ class QueryBuilder<T> {
 		this.prismaQuery.where = {
 			...this.prismaQuery.where,
 			...formattedFilters,
-			...staticFilter,
 		};
 
 		return this;
