@@ -3,7 +3,6 @@ import httpStatus from "http-status";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import path from "path";
-import bodyParser from "body-parser";
 import router from "./app/routes";
 import GlobalErrorHandler from "./app/middlewares/globalErrorHandler";
 
@@ -20,8 +19,8 @@ export const corsOptions = {
 app.use(cors(corsOptions));
 app.use(cookieParser());
 app.use(express.json());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+// app.use(bodyParser.json());
+// app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
 // Route handler for the root endpoint

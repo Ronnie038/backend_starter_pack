@@ -1,5 +1,5 @@
-import { UserRole } from "@prisma/client";
 import bcrypt from "bcryptjs";
+import { Prisma, UserRole } from "@prisma/client";
 import prisma from "../../shared/prisma";
 
 export const initiateSuperAdmin = async () => {
@@ -19,10 +19,10 @@ export const initiateSuperAdmin = async () => {
 		return;
 	}
 
-	await prisma.$transaction(async (TransactionClient) => {
+	await prisma.$transaction(async (TX: Prisma.TransactionClient) => {
 		const hashedPassword: string = await bcrypt.hash(payload.password, 12);
 
-		await TransactionClient.user.create({
+		await TX.user.create({
 			data: {
 				...payload,
 				password: hashedPassword,

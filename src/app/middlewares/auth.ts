@@ -3,7 +3,6 @@ import { NextFunction, Request, Response } from "express";
 import { Secret } from "jsonwebtoken";
 import config from "../../config";
 
-import { UserRole } from "@prisma/client";
 import httpStatus from "http-status";
 import ApiError from "../../errors/ApiErrors";
 import { jwtHelpers } from "../../helpars/jwtHelpers";
@@ -38,8 +37,6 @@ const auth = (...roles: string[]) => {
 			if (!user) {
 				throw new ApiError(httpStatus.NOT_FOUND, "This user is not found !");
 			}
-
-			
 
 			if (roles.length && !roles.includes(verifiedUser.role)) {
 				throw new ApiError(httpStatus.FORBIDDEN, "Forbidden!");

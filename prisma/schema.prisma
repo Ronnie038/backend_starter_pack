@@ -41,8 +41,7 @@ model User {
 
 enum UserRole {
   ADMIN
-  INVESTOR
-  COMPANY
+  USER
 }
 
 enum CampaignType {

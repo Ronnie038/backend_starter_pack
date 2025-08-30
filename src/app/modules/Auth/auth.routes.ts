@@ -3,9 +3,6 @@ import auth from "../../middlewares/auth";
 import validateRequest from "../../middlewares/validateRequest";
 import { AuthController } from "./auth.controller";
 import { AuthValidation } from "./auth.validation";
-import config from "../../../config";
-import { passport } from "../../../config/passportSetup";
-import { UserRole } from "@prisma/client";
 
 const router = express.Router();
 
@@ -23,15 +20,11 @@ router.post("/otp-enter", AuthController.enterOtp);
 // user logout route
 router.post("/logout", AuthController.logoutUser);
 
-router.get(
-	"/get-me",
-	auth(UserRole.ADMIN, UserRole.ADMIN, UserRole.INVESTOR, UserRole.COMPANY),
-	AuthController.getMyProfile
-);
+router.get("/get-me", auth(), AuthController.getMyProfile);
 
 router.put(
 	"/change-password",
-	auth(UserRole.ADMIN, UserRole.ADMIN, UserRole.INVESTOR, UserRole.COMPANY),
+	auth(),
 	validateRequest(AuthValidation.changePasswordValidationSchema),
 	AuthController.changePassword
 );
@@ -47,16 +40,16 @@ router.post(
 	AuthController.refreshToken
 );
 
-// Google Login Routes
-router.get(
-	"/google",
-	passport.authenticate("google", { scope: ["profile", "email"] })
-);
-router.get(
-	"/google/callback",
-	passport.authenticate("google", {
-		failureRedirect: `${config.frontend_url}/login`,
-		successRedirect: `${config.frontend_url}/`,
-	})
-);
+// // Google Login Routes
+// router.get(
+// 	"/google",
+// 	passport.authenticate("google", { scope: ["profile", "email"] })
+// );
+// router.get(
+// 	"/google/callback",
+// 	passport.authenticate("google", {
+// 		failureRedirect: `${config.frontend_url}/login`,
+// 		successRedirect: `${config.frontend_url}/`,
+// 	})
+// );
 export const AuthRoutes = router;
